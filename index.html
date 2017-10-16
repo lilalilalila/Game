@@ -92,9 +92,12 @@
 				var num = 1;
 				oBtn.onclick = function(){
 					//初始随机获得图片的样式以及出现位置
+					aText[0].innerHTML = '0分';
+					aText[1].innerHTML = '0分';
+					oFinish.style.display = 'none';
+					num = 1;
 					oImg.src = arr[Math.round(Math.random()*7)]
 					oImg.style.left = Math.round(Math.random()*830) + 'px';
-					
 					iMove();
 				}
 				
