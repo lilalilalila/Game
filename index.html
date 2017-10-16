@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<style>
+			*{
+				padding: 0;
+				margin: 0;
+			}
+			.content {
+				position: relative;
+				margin: 30px auto;
+				width: 900px;
+				height: 700px;
+				text-align: center;
+				border: 1px solid #999;
+				background: lightslategrey
+			}
+			h4 {
+				margin: 15px;
+				font-size: 40px;
+				color: #fff;
+			}
+			p {
+				margin: 8px 50px;
+				text-align: left;
+				color: #fff;
+			}
+			#show {
+				position: relative;				
+				margin: 0 auto;
+				width: 880px;
+				height: 500px;
+				border: 1px solid #fff;
+				background: #fff;
+				overflow: hidden;
+			}
+			input {
+				width:150px;
+				height: 50px;
+				margin-top: 8px;
+				font-size: 19px;
+				font-weight: 700;
+				border: none;
+				background: lightcoral;
+				color: #fff;
+			}
+			img {
+				position: absolute;
+				top: -30px;
+				left: 0;
+				display: block;
+				width: 50px;
+				filter: alpha(opacity = 100);
+				opacity: 1;
+			}
+			#finish{
+				display: none;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin-top: -50px;
+				margin-left: -200px;
+				text-align: center;
+				font-size: 20px;
+				font-weight: 700;
+				width: 400px;
+				height: 100px;
+				line-height: 100px;
+				border: 1px soldi lightslategray;
+				color: #fff;
+				background: lightseagreen;
+			}
+		</style>
+		<script>
+			window.onload = function () {
+				var oH = document.getElementsByTagName('h4')[0];
+				var aP = document.getElementsByTagName('p');
+				var aText = document.getElementsByTagName('span');
+				var oShow = document.getElementById('show');
+				var oBtn = document.getElementsByTagName('input')[0];
+				var oImg = oShow.getElementsByTagName('img')[0];
+				var oFinish = document.getElementById('finish');
+				
+				var arr = ['img/1.jpg','img/2.jpg','img/3.jpg','img/4.jpg','img/5.jpg','img/6.jpg','img/7.jpg','img/8.jpg']
+				
+				var Mark = null;
+				
+				Mark = parseInt(aText[0].innerHTML);
+				
+				var num = 1;
+				oBtn.onclick = function(){
+					//初始随机获得图片的样式以及出现位置
+					oImg.src = arr[Math.round(Math.random()*7)]
+					oImg.style.left = Math.round(Math.random()*830) + 'px';
+					
+					iMove();
+				}
+				
+				function iMove(){
+					
+					clearInterval(oImg.timer);
+					
+					oImg.timer = setInterval(function(){
+						
+						var dis = parseInt(getStyle(oImg,'top'));
+						
+						Mark = parseInt(aText[1].innerHTML);
+						
+						//游戏终止条件
+						if(Mark == 30){
+							oFinish.style.display = 'block';
+							clearInterval(oImg.timer);
+						}
+						
+						//图片掉落速度控制
+						if(num>10) return num = 10;
+						
+						oImg.style.top = dis + num + 'px';
+						
+						//点击消除事件
+						if(dis < 500) {
+							oImg.onclick = function () {
+								clearInterval(oImg.timer);
+								shake(function(){
+									hid(function(){
+										oImg.src = arr[Math.round(Math.random()*7)]
+										oImg.style.left = Math.round(Math.random()*830) + 'px';
+										
+										oImg.style.filter = 'alpha(opacity = 100)';
+										oImg.style.opacity = 1;
+										oImg.style.top = '0px';
+										num ++;
+									});
+								});
+								
+							}
+						} else {
+							//当图片到底时自动随机获取下一次出现的位置以及图片样式
+							oImg.style.left = Math.round(Math.random()*830) + 'px';
+							oImg.src = arr[Math.round(Math.random()*7)]
+							oImg.style.top = '0px';
+							
+							//计分
+							aText[1].innerHTML = Mark + 10 + '分';
+							num ++;
+						}
+					},80);
+				}
+				
+				//隐藏
+				function hid(endFn){
+					clearInterval(oImg.hidTimer);
+					oImg.hidTimer = setInterval(function(){
+						var oPa = parseInt(getStyle(oImg,'opacity'));
+						var mark1 = parseInt(aText[0].innerHTML);
+						
+						oImg.style.filter = 'alpha(opacity = ' + oPa*100 - 3 + ')';
+						oImg.style.opacity = oPa - 0.3;
+						
+						if(oPa == 0){
+							aText[0].innerHTML = mark1 + 10 + '分';
+							clearInterval(oImg.hidTimer);
+							iMove();
+							endFn();
+						}
+					},80)
+				}
+				
+				//抖动
+				function shake(endFn){
+					var arr1 = [];
+					var numShake = 0;
+					
+					for(var i=0; i<10; i++){
+						arr1.push(-i,i);
+					}
+					arr1.push(0);
+					
+					clearInterval(oImg.shakeTimer);
+					
+					oImg.shakeTimer = setInterval(function(){
+						var nL = parseInt(getStyle(oImg,'left'));
+						oImg.style.left = nL + arr1[numShake] + 'px';
+						numShake++;
+						if(numShake == arr1.length){
+							clearInterval(oImg.shakeTimer);
+							endFn();
+						}
+					},50)
+				}
+				
+				function getStyle(obj,attr){
+					return obj.currentStyle ? obj.currentStyle[attr] : getComputedStyle(obj)[attr];
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<div class="content">
+			<h4>消表情</h4>
+			<p>得分：<span>0分</span></p>			
+			<p>扣分: <span>0分</span></p>
+			<div id="show">
+				<img src="img/1.jpg"/>
+			</div>
+			<div id="finish">
+				游戏结束，下次继续努力
+			</div>
+			<input type="button" value="开始游戏" />
+		</div>
+	</body>
+</html>
